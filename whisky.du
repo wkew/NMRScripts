@@ -1,0 +1,110 @@
+;whisky.du
+;avance-version (11/01/17)
+;1D with presaturation during relaxation delay and mixing time
+;   and spoil gradient
+;using shaped pulse for multiple solvent presaturation
+;   (main solvent peak on resonance) during relaxation delay
+;using cw presaturation during mixing time
+;
+;$CLASS=HighRes
+;$DIM=1D
+;$TYPE=
+;$SUBTYPE=
+;$COMMENT=
+#include <Avance.incl>
+#include <Grad.incl>
+#include <Delay.incl>
+"d12=20u"
+"d13=4u"
+"p2=2*p1"
+"p17=700"
+"p30=192"
+
+"DELTA2=d2-2*p3-2u"
+"if (d1/p23 < 1) {l6=1;} else {l6=d1/(p23);}"
+"acqt0=-p0*2/3.1416"
+
+1 ze
+  d12 pl22:f3
+  d12 pl9:f1
+  d12 pl24:f2
+2 30m
+  d13 do:f2
+#   ifdef FLAG_BLK
+  4u BLKGRAD
+#   else
+  4u
+#   endif /*FLAG_BLK*/
+
+#   ifdef C13_DEC
+  d12 cw:f3 ph29
+  d12 cpds2:f2
+3 (p23:sp23 ph29):f1
+  4u
+  lo to 3 times l6
+  d13 do:f3
+  d13 do:f2
+# else
+  d12 cw:f3 ph29
+3 (p23:sp23 ph29):f1
+  4u
+  lo to 3 times l6
+  d13 do:f3
+# endif
+  50u UNBLKGRAD
+
+  p19:gp1
+  d16 pl1:f1
+
+  p1 ph1
+  4u
+  p1 ph2
+  4u
+
+  p16:gp2
+  d16
+
+#   ifdef FLAG_BLK
+  4u
+#   else
+  4u BLKGRAD
+#   endif /*FLAG_BLK*/
+  p0 ph3    ;READ PULSE
+  go=2 ph31
+  30m mc #0 to 2 F0(zd)
+  d13 do:f2
+#   ifdef FLAG_BLK
+  4u BLKGRAD
+#   else
+  4u
+#   endif /*FLAG_BLK*/
+exit
+
+ph1=0 2
+ph2=0 0 0 0 0 0 0 0 2 2 2 2 2 2 2 2
+ph3=0 0 2 2 1 1 3 3
+ph27=16{0} 16{2}
+ph29=32{0} 32{2}
+ph31=0 2 2 0 1 3 3 1 2 0 0 2 3 1 1 3
+
+;pl1 : f1 channel - power level for pulse (default)
+;pl9 : f1 channel - power level for presaturation
+;sp6: f1 channel - shaped pulse for presaturation
+;p0 : for any flip angle
+;p1 : f1 channel -  90 degree high power pulse
+;p16: homospoil/gradient pulse
+;p23: f1 channel - presaturation using shaped pulse
+;d1 : relaxation delay; 1-5 * T1
+;d12: delay for power switching                      [20 usec]
+;d16: delay for homospoil/gradient recovery
+;l6: p23 * l6 = total duration of presaturation
+;NS: 8 * n, total number of scans: NS * TD0
+;DS: 4
+
+;for z-only gradients:
+;gpz1: 50%
+;gpz2: -11%
+
+;use gradient files:
+;gpnam1: SMSQ10.100
+;gpnam2: SMSQ10.100
