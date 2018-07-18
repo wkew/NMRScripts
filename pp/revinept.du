@@ -1,0 +1,126 @@
+; reviept.du
+
+
+#include <Avance.incl>
+#include <Delay.incl>
+#include <Grad.incl>
+
+
+"p2=p1*2"
+"p4=p3*2"
+"p16=2.5m"
+"d3=1s/(cnst2*cnst11)"
+"d4=1s/(cnst3*4)"
+"d12=20u"
+"d13=3u"
+
+# ifdef GRAD 
+"d21=1s/(cnst2*8)-p19-d16"
+# else
+"d21=1s/(cnst2*8)"
+# endif
+
+"acqt0=-p1*2/3.1416"
+
+1 ze
+2 30m  
+  d12 pl2:f2
+  d12 pl10:f1
+  d12 BLKGRAD
+
+# ifdef PRESAT
+  d12 pl9:f1
+  d1 cw:f1 ph29
+  d13 do:f1
+  d12 pl1:f1
+# else
+  d1
+# endif
+  d12 UNBLKGRAD
+  (p17 ph9)
+  (p17*3.9 ph10) 
+
+  4u
+  p16:gp2
+  d16
+
+  (p3 ph1):f2 	; this is the real start
+
+# ifdef GRAD 
+  4u
+  p19:gp1
+  d16
+  d21 pl1:f1
+  (center (p4 ph4):f2 (p2 ph2) )
+  d21
+  p19:gp1
+  d16
+  4u
+# else
+  4u
+  d21 pl1:f1
+  (center (p4 ph2):f2 (p2 ph4) )
+  d21
+  4u
+ ;4u BLKGRAD
+# endif
+
+  (p3 ph3):f2 
+  (p1 ph5)
+  go=2 ph31
+  30m mc #0 to 2 F0(zd)
+ 50u BLKGRAD
+exit
+
+/*
+ph1= 0 0 0 0 2 2 2 2
+;ph1= 0 0 2 2
+ph2= 0
+ph3= 1 3
+ph4= 2 2 0 0 
+ph5= 0 
+ph6= 0
+ph7= 0 
+ph8= 2 
+ph9=0
+ph10=1
+ph29= 0 
+ph31=0 2 0 2 2 0 2 0 
+;ph31=0 2 2 0
+*/
+
+ph1=0 0 2 2
+ph2= 0 0 0 0 2 2 2 2
+ph3=1 3
+ph4=0 0 0 0 0 0 0 0 
+    2 2 2 2 2 2 2 2
+ph5=0
+ph9=0
+ph10=1
+ph31=0 2 2 0 
+
+
+;pl1 : f1 channel - power level for pulse (default)
+;pl2 : f2 channel - power level for pulse (default)
+;pl12: f2 channel - power level for CPD/BB decoupling
+;p1 : f1 channel -  90 degree high power pulse
+;p2 : f1 channel - 180 degree high power pulse
+;p3 : f2 channel -  90 degree high power pulse
+;p4 : f2 channel - 180 degree high power pulse
+;d1 : relaxation delay; 1-5 * T1
+;d3 : 1/(3J(XH)) for all multiplicities
+;d4 : 1/(4J(XX))
+;d12: delay for power switching                      [20 usec]
+;d13: short delay                                    [3 usec]
+;d21: 1/(4J(XH))
+;cnst2: = J(XH)
+;cnst3: = J(XX)
+;cnst11: = 3 for all multiplicities
+;NS: 64 * n, total number of scans: NS * TD0
+;DS: 16
+;cpd2: decoupling according to sequence defined by cpdprg2
+;pcpd2: f2 channel - 90 degree pulse for decoupling sequence
+
+
+
+;$Id: inepin,v 1.8 2002/06/12 09:04:59 ber Exp $

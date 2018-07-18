@@ -1,0 +1,2 @@
+XCMD("sendgui createCarbonShape.py acq")
+QUIT

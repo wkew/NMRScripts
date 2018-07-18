@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TOPSPIN		Version 3.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 16	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= chemist
+$$ 2015-07-09 14:53:54.381 +0100  chemist@ava600
+$$ /opt/topspin3.2/exp/stan/nmr/par/user/whisky_final/outd
+$$ process /opt/topspin3.2/prog/mod/edparproc
+##$CURPLOT= <>
+##$CURPRIN= <>
+##$DFORMAT= <normdp>
+##$LAYOUT= <>
+##$LFORMAT= <normlp>
+##$PFORMAT= <normpl>
+##END=

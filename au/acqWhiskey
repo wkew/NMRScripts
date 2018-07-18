@@ -1,0 +1,2 @@
+XCMD("sendgui acqWhiskey.py")
+QUIT

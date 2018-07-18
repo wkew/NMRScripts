@@ -1,0 +1,2 @@
+XCMD("sendgui createEthanolShape_wk.py acq")
+QUIT
