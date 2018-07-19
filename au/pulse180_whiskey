@@ -1,0 +1,127 @@
+/*** ^^A -*-C++-*- **********************************************/
+/*	pulse		21.09.1995				*/
+/****************************************************************/
+/*	Short Description :					*/
+/*	Program to calculate attenuation value for given pulse	*/
+/*	length or nutation frequency, or vice versa.		*/
+/****************************************************************/
+/*	Keywords :						*/
+/*	calculate power level or pulse length			*/
+/****************************************************************/
+/*	Description/Usage :					*/
+/*	Program to calculate attenuation value for given pulse	*/
+/*	length or nutation frequency, or vice versa. It uses	*/
+/*	the value of P1 together with the associated power	*/
+/*	level (PL1 on Avance, HL1 on AMX and Tl0 on ARX) as a	*/
+/*	"reference 90 degree pulse".				*/
+/*	The pulse length, frequency, or attenuation value may	*/
+/*	be entered on the command line followed by the		*/
+/*	appropriate unit e.g. :					*/
+/*	"xau pulse 50 us" for a 50 us pulse, or			*/
+/*	"xau pulse 27 db" for 27 dB.				*/
+/*	The program assumes that the reference pulse and power	*/
+/*	level are appropriate for a ninety degree pulse.	*/
+/*	The (calculated) attentuation is rounded to the next	*/
+/*	lower integer value and the corresponding pulse length	*/
+/*	is re-calculated.					*/
+/****************************************************************/
+/*	Author(s) :						*/
+/*	Name		: Joost A. B. Lohman			*/
+/*	Organisation	: Bruker Spectrospin ltd		*/
+/*	Email		: j.lohman@bruker.co.uk			*/
+/****************************************************************/
+/*	Name		Date		Modification:		*/
+/*	jab		19950921	created			*/
+/*	ge		20091117	PL->PLW			*/
+/****************************************************************/
+/*
+$Id: pulse,v 1.12 2009/11/19 05:15:05 wem Exp $
+*/
+
+/*	Define some functions and variables			*/
+
+char  answer[256];
+char* cp;
+const char* unit;
+float ref_length, ref_power;
+double value, length, ref_atten, atten, ref_freq, freq, power;
+
+/*	Go to current data set and get reference parameters	*/
+/*	They will be reported at the end of the program		*/
+
+FETCHPAR("P 1", &ref_length)
+FETCHPAR("PLW 1", &ref_power)
+freq   = 0;
+length = 0;
+atten  = 0;
+ref_atten = -10.0 * log10(ref_power);
+ref_freq = 1000000.0 / (4.0 * ref_length);
+
+/*	Get new value; try the command line first		*/
+/*	Default is 100 us pulse					*/
+
+if (i_argc > 3)
+{
+    value = atof(i_argv[2]);
+    unit = i_argv[3];
+}
+else if (i_argc > 2)
+{
+    value = strtod(i_argv[2], &cp);
+    unit = cp;
+}
+else
+{
+    answer[0] = 0;
+    GETSTRING("Enter pulse length(us,ms,s), frequency(Hz,kHz), or power (W) (attenuation dB):", answer);
+    value = strtod(answer, &cp);
+    unit = cp;
+
+    while (*unit  &&  isspace((int)*unit))
+	unit++;
+}
+
+if (unit[0] == 0)
+    length = value;
+else
+{
+    if      (strcasecmp(unit, "US") == 0)	length = value;
+    else if (strcasecmp(unit, "MS") == 0)	length = value * 1000.0;
+    else if (strcasecmp(unit, "S")  == 0)	length = value * 1000000.0;
+    else if (strcasecmp(unit, "DB") == 0)	atten = value;
+    else if (strcasecmp(unit, "W")  == 0)	atten = -10.0 * log10(value);
+    else if (strcasecmp(unit, "HZ") == 0)	freq = value;
+    else if (strcasecmp(unit, "KHZ")== 0)	freq = value * 1000.0;
+    else STOPMSG("Illegal unit\nLegal units are us, ms, s, Hz, kHz, W, or dB")
+}
+
+/*	Calculate new attenuation value  or pulse length	*/
+
+if (strcasecmp(unit, "DB")  &&  strcasecmp(unit, "W"))
+{
+    if (freq != 0)
+	length = ref_length * ref_freq / freq;
+
+    atten = ref_atten - 20.0 * log10(ref_length / length);
+}
+else
+{
+    length = ref_length * pow(10.0, (atten - ref_atten) / 20.0);
+}
+power = pow(10.0, -atten / 10.0);
+freq = 1000000.0 / (4.0 * length);
+
+atten = atten -15.0;
+
+STOREPAR("SPdB 23",atten);
+
+/* 
+Proc_err(ERROPT_AK_NO,
+	 "Calculation of pulse attenuation values\n"
+	 "            length  frequency    power (attenuation)\n"
+	 "ref:  %9.1f us %7.0f Hz %10.7f W (= %5.1f dB)\n"
+	 "calc: %9.1f us %7.0f Hz %10.7f W (= %5.1f dB)",
+	 ref_length, ref_freq, ref_power, ref_atten,
+	 length, freq, power, atten);
+*/
+QUIT

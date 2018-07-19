@@ -1,0 +1,23 @@
+// shim program for IconNMR
+//
+// basically run Topshim, but with some fallback in case of problems
+
+// sleep(120); //added for thermal equilibrium for temperature experiments
+#include <inc/bsms_program>    /* must be the first statement ****/
+int z;
+GETCURDATA
+SETCURDATA AUERR=CPR_exec("topshim ss o1p=4.77 selwid=0.5 rga tunea", WAIT_TERM);
+
+if (AUERR)
+{
+	// topshim failed?
+	sleep(10);  // bit more thermal equilibrium
+}
+sleep(3);
+
+GETBSMSVAL(BSN_Z,z)
+//if ( (zinc=atoi(cmd)) == 18) zinc=DEFZINC;
+z+=12; //12 seems to work 8/2/18
+PUTBSMSVAL(BSN_Z, z)
+
+QUIT
