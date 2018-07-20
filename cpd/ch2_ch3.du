@@ -1,0 +1,22 @@
+#setphase
+1 pcpd:sp24:0 pl=sp24
+  pcpd:sp24:150
+  pcpd:sp24:60
+  pcpd:sp24:150
+  pcpd:sp24:0
+  pcpd:sp24:0 
+  pcpd:sp24:150
+  pcpd:sp24:60
+  pcpd:sp24:150
+  pcpd:sp24:0
+  pcpd:sp24:180 
+  pcpd:sp24:330
+  pcpd:sp24:240
+  pcpd:sp24:330
+  pcpd:sp24:180
+  pcpd:sp24:180 
+  pcpd:sp24:330
+  pcpd:sp24:240
+  pcpd:sp24:330
+  pcpd:sp24:180
+  jump to 1
